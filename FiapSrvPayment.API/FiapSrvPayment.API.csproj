@@ -4,7 +4,19 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+	  <ExcludeByFile>$(MSBuildProjectDirectory)/Program.cs</ExcludeByFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="Controllers\*.cs">
+      <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+    </None>
+    <None Update="Program.cs">
+      <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+    </None>
+  </ItemGroup>	
 
   <ItemGroup>
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.4.0" />

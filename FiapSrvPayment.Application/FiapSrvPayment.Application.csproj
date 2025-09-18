@@ -4,7 +4,20 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
   </PropertyGroup>
+
+	<ItemGroup>
+		<None Update="DTOs\*.cs">
+			<ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+		</None>
+		<None Update="Interface\*.cs">
+			<ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+		</None>
+		<None Update="Exceptions\*.cs">
+			<ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+		</None>
+	</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.9" />

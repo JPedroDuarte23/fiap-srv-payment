@@ -4,7 +4,21 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+  	<ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
   </PropertyGroup>
+
+	<ItemGroup>
+		<None Update="Configuration\*.cs">
+			<ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+		</None>
+		<None Update="Mappings\*.cs">
+			<ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+		</None>
+	</ItemGroup>
+
+  <ItemGroup>
+		<None Include="Mappings\UserMapping.cs" />
+	</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
