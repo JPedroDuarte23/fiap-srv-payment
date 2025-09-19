@@ -1,6 +1,0 @@
-@FiapSrvPayment.API_HostAddress = http://localhost:5197
-
-GET {{FiapSrvPayment.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
