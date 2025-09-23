@@ -23,14 +23,14 @@ Log.Logger = SerilogConfiguration.ConfigureSerilog();
 builder.Host.UseSerilog();
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
 builder.Services.AddAWSService<IAmazonSimpleSystemsManagement>();
-
+builder.Services.AddAWSService<Amazon.S3.IAmazonS3>(); 
 
 string mongoConnectionString;
 string jwtSigningKey;
 
 if (!builder.Environment.IsDevelopment())
 {
-    Log.Information("Ambiente de Produção. Buscando segredos do AWS Parameter Store.");
+    Log.Information("Ambiente de Produï¿½ï¿½o. Buscando segredos do AWS Parameter Store.");
     var ssmClient = new AmazonSimpleSystemsManagementClient();
 
     var mongoParameterName = builder.Configuration["ParameterStore:MongoConnectionString"];
@@ -68,7 +68,7 @@ else
 }
 
 
-// 3. Configuração do MongoDB e Repositórios
+// 3. Configuraï¿½ï¿½o do MongoDB e Repositï¿½rios
 var databaseName = builder.Configuration["MongoDbSettings:DatabaseName"];
 builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
 builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(databaseName));
@@ -79,13 +79,13 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IGameRepository, GameRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-// 4. Configuração de Autenticação e Autorização
+// 4. Configuraï¿½ï¿½o de Autenticaï¿½ï¿½o e Autorizaï¿½ï¿½o
 // A classe JwtBearerConfiguration precisa receber a chave que buscamos
 builder.Services.ConfigureJwtBearer(builder.Configuration, jwtSigningKey);
 builder.Services.AddAuthorization();
 
 
-// -- Resto da configuração (Controllers, Swagger, etc.) --
+// -- Resto da configuraï¿½ï¿½o (Controllers, Swagger, etc.) --
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

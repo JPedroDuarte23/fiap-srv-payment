@@ -22,5 +22,5 @@ jobs:
   call-deploy:
     needs: call-cd
     if: success()
-    uses: ./.github/workflows/deploy.yml
+    uses: ./.github/workflows/deploy-aws.yml
     secrets: inherit
