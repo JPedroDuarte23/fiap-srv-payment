@@ -45,7 +45,7 @@ public class CartController : ControllerBase
         return Ok(cart);
     }
 
-    [HttpPost]
+    [HttpPost("checkout")]
     [Authorize(Roles = "Player")]
     public async Task<IActionResult> Checkout()
     {
