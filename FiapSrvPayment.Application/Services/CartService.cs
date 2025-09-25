@@ -1,7 +1,11 @@
-﻿using FiapSrvPayment.Application.Exceptions;
+﻿using System.Text.Json;
+using FiapSrvPayment.Application.Exceptions;
 using FiapSrvPayment.Application.Interface;
 using FiapSrvPayment.Domain.Entities;
 using Microsoft.Extensions.Logging;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
+using Microsoft.Extensions.Configuration;
 
 namespace FiapSrvPayment.Application.Services;
 
@@ -10,6 +14,8 @@ public class CartService : ICartService
     private readonly IUserRepository _userRepository;
     private readonly IGameRepository _gameRepository;
     private readonly ILogger<CartService> _logger;
+    private readonly IAmazonSimpleNotificationService _snsClient; 
+    private readonly IConfiguration _configuration;
     public CartService(IUserRepository userRepository, IGameRepository gameRepository, ILogger<CartService> logger)
     {
         _userRepository = userRepository;
@@ -25,7 +31,7 @@ public class CartService : ICartService
         if (user == null)
         {
             _logger.LogWarning("Usuário {UserId} não encontrado ao tentar adicionar jogo {GameId} ao carrinho", userId, gameId);
-            throw new NotFoundException("Usuário não encontrado");
+            throw new Exceptions.NotFoundException("Usuário não encontrado");
 
         }
 
@@ -53,14 +59,14 @@ public class CartService : ICartService
         if (user == null)
         {
             _logger.LogWarning("Usuário {UserId} não encontrado ao tentar remover jogo {GameId} do carrinho", userId, gameId);
-            throw new NotFoundException("Usuário não encontrado");
+            throw new Exceptions.NotFoundException("Usuário não encontrado");
         }
             
 
         if (!user.Cart.Contains(gameId))
         {
             _logger.LogWarning("Jogo {GameId} não está no carrinho do usuário {UserId}", gameId, userId);
-            throw new NotFoundException("Jogo não está na biblioteca.");
+            throw new Exceptions.NotFoundException("Jogo não está na biblioteca.");
 
         }
 
@@ -85,7 +91,7 @@ public class CartService : ICartService
         if (user == null)
         {
             _logger.LogWarning("Usuário {UserId} não encontrado ao buscar carrinho", userId);
-            throw new NotFoundException("Usuário não encontrado");
+            throw new Exceptions.NotFoundException("Usuário não encontrado");
         }
             
         var cart = await _gameRepository.GetByIdsAsync(user.Cart);
@@ -101,7 +107,7 @@ public class CartService : ICartService
         if (user == null)
         {
             _logger.LogWarning("Usuário {UserId} não encontrado ao tentar fazer checkout", userId);
-            throw new NotFoundException("Usuário não encontrado");
+            throw new Exceptions.NotFoundException("Usuário não encontrado");
         }
 
         if (user.Cart.Count == 0)
@@ -111,12 +117,34 @@ public class CartService : ICartService
         }
         var games = await _gameRepository.GetByIdsAsync(user.Cart);
         var totalPrice = games.Sum(g => g.Price);
+        var gamesPurchased = user.Cart;
         user.Library.AddRange(user.Cart);
         user.Cart.Clear();
         try
         {
             await _userRepository.UpdateAsync(user);
             _logger.LogInformation("Checkout realizado com sucesso para o usuário {UserId}.", userId);
+
+            var message = new
+            {
+                UserId = user.Id,
+                UserEmail = user.Email,
+                UserName = user.Name,
+                GameIds = gamesPurchased,
+                TotalPrice = totalPrice,
+                PurchaseDate = DateTime.UtcNow
+            };
+
+            var topicArn = _configuration["SnsTopics:SuccessCheckoutTopicArn"];
+            var publishRequest = new PublishRequest
+            {
+                TopicArn = topicArn,
+                Message = JsonSerializer.Serialize(message),
+                MessageGroupId = "checkout" 
+            };
+
+            await _snsClient.PublishAsync(publishRequest);
+            _logger.LogInformation("Mensagem de checkout para o usuário {UserId} publicada no tópico SNS.", userId);
         }
         catch (Exception ex)
         {

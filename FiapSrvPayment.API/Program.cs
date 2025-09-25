@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using Serilog;
-using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;  
 
 [assembly: ExcludeFromCodeCoverage]
 
@@ -23,7 +23,8 @@ Log.Logger = SerilogConfiguration.ConfigureSerilog();
 builder.Host.UseSerilog();
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
 builder.Services.AddAWSService<IAmazonSimpleSystemsManagement>();
-builder.Services.AddAWSService<Amazon.S3.IAmazonS3>(); 
+builder.Services.AddAWSService<Amazon.S3.IAmazonS3>();
+builder.Services.AddAWSService<Amazon.SimpleNotificationService.IAmazonSimpleNotificationService>();
 
 string mongoConnectionString;
 string jwtSigningKey;
