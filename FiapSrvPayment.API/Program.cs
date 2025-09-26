@@ -13,7 +13,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using Serilog;
-using System.Diagnostics.CodeAnalysis;  
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 [assembly: ExcludeFromCodeCoverage]
 
@@ -91,6 +92,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
 builder.Services.AddEndpointsApiExplorer();

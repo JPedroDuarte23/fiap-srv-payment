@@ -16,11 +16,13 @@ public class CartService : ICartService
     private readonly ILogger<CartService> _logger;
     private readonly IAmazonSimpleNotificationService _snsClient; 
     private readonly IConfiguration _configuration;
-    public CartService(IUserRepository userRepository, IGameRepository gameRepository, ILogger<CartService> logger)
+    public CartService(IUserRepository userRepository, IGameRepository gameRepository, ILogger<CartService> logger, IAmazonSimpleNotificationService snsClient, IConfiguration configuration)
     {
         _userRepository = userRepository;
         _gameRepository = gameRepository;
         _logger = logger;
+        _snsClient = snsClient;
+        _configuration = configuration;
     }
 
     public async Task AddToCart(Guid gameId, Guid userId)
@@ -113,11 +115,12 @@ public class CartService : ICartService
         if (user.Cart.Count == 0)
         {
             _logger.LogWarning("Carrinho vazio para o usuário {UserId} ao tentar fazer checkout", userId);
-            throw new InvalidOperationException("Carrinho vazio");
+            throw new Exceptions.BadRequestException("Carrinho vazio");
         }
         var games = await _gameRepository.GetByIdsAsync(user.Cart);
         var totalPrice = games.Sum(g => g.Price);
-        var gamesPurchased = user.Cart;
+
+        var gamesPurchasedNames = games.Select(g => g.Title).ToList();
         user.Library.AddRange(user.Cart);
         user.Cart.Clear();
         try
@@ -130,9 +133,9 @@ public class CartService : ICartService
                 UserId = user.Id,
                 UserEmail = user.Email,
                 UserName = user.Name,
-                GameIds = gamesPurchased,
+                GameIds = gamesPurchasedNames,
                 TotalPrice = totalPrice,
-                PurchaseDate = DateTime.UtcNow
+                PurchaseDate = DateTime.UtcNow,
             };
 
             var topicArn = _configuration["SnsTopics:SuccessCheckoutTopicArn"];

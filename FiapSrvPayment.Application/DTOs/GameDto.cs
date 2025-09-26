@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FiapSrvPayment.Domain.Enums;
 
 namespace FiapSrvPayment.Application.DTOs;
 
@@ -16,4 +17,8 @@ public class GameDto
     public string Description { get; set; }
     public double Price { get; set; }
     public DateTime ReleaseDate { get; set; }
+    
+    public List<GameGenre> Genres { get; set; }
+    public List<GameTag> Tags { get; set; }
+
 }
