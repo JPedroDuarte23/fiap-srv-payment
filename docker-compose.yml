@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # --- SUA APLICAÇÃO (.NET) ---
   fiap-srv-games:
-    container_name: fiap-srv-auth-manager
+    container_name: fiap-srv-payment
     build: .
     ports:
       - "8080:8080"
