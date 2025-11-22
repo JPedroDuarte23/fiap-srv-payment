@@ -15,6 +15,7 @@ using MongoDB.Driver;
 using Serilog;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using Prometheus;
 
 [assembly: ExcludeFromCodeCoverage]
 
@@ -137,6 +138,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+app.UseHttpMetrics();
+
+app.MapMetrics();
 app.MapControllers();
 
 app.Run();
