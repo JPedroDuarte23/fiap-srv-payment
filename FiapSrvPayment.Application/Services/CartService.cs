@@ -120,8 +120,10 @@ public class CartService : ICartService
         var games = await _gameRepository.GetByIdsAsync(user.Cart);
         var totalPrice = games.Sum(g => g.Price);
 
-        var gamesPurchasedNames = games.Select(g => g.Title).ToList();
-        user.Library.AddRange(user.Cart);
+        var purchasedGameIds = new List<Guid>(user.Cart);
+        var gamesPurchasedNames = games.Select(g => g.Title ).ToList();
+
+
         user.Cart.Clear();
         try
         {
@@ -133,7 +135,8 @@ public class CartService : ICartService
                 UserId = user.Id,
                 UserEmail = user.Email,
                 UserName = user.Name,
-                GameIds = gamesPurchasedNames,
+                GameIds = purchasedGameIds,
+                GameNames = gamesPurchasedNames,
                 TotalPrice = totalPrice,
                 PurchaseDate = DateTime.UtcNow,
             };
@@ -147,7 +150,7 @@ public class CartService : ICartService
             };
 
             await _snsClient.PublishAsync(publishRequest);
-            _logger.LogInformation("Mensagem de checkout para o usuário {UserId} publicada no tópico SNS.", userId);
+            _logger.LogInformation("Evento CheckoutCompleted publicado para o usuário {UserId}. O processamento continuará assincronamente.", userId);
         }
         catch (Exception ex)
         {
