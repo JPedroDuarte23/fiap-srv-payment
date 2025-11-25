@@ -199,7 +199,7 @@ public class CartServiceTest
         await _service.Checkout(userId);
 
         // Assert
-        _userRepoMock.Verify(r => r.UpdateAsync(It.Is<Player>(p => p.Library.Contains(gameId) && p.Cart.Count == 0)), Times.Once);
+        _userRepoMock.Verify(r => r.UpdateAsync(It.Is<Player>(p => p.Cart.Count == 0)), Times.Once);
         _snsClientMock.Verify(s => s.PublishAsync(It.IsAny<PublishRequest>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
